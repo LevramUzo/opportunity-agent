@@ -36,3 +36,7 @@ export GEMINI_API_KEY="your-key"
 
 # Run
 python agent.py
+
+## Live Demo
+
+Try it here: https://opportunity-agent-production-3e05.up.railway.app/
