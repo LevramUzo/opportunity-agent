@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Results - Opportunity Intelligence</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        .header {
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            font-size: 2rem;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .header p {
+            color: #94a3b8;
+            margin-top: 5px;
+        }
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background: #1e293b;
+            color: #60a5fa;
+            text-decoration: none;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            transition: background 0.2s;
+        }
+        .back-btn:hover {
+            background: #334155;
+        }
+        .stats {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .stats .number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #60a5fa;
+        }
+        .stats .label {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+        .opportunity-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        .opportunity-card:hover {
+            transform: translateY(-3px);
+            border-color: #60a5fa;
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            gap: 15px;
+        }
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #f1f5f9;
+        }
+        .card-org {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+        .score-badge {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+        .type-badge {
+            display: inline-block;
+            background: #0f172a;
+            color: #60a5fa;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid #334155;
+            margin-bottom: 12px;
+        }
+        .card-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #cbd5e1;
+            font-size: 0.9rem;
+        }
+        .detail-item .icon {
+            font-size: 1.1rem;
+        }
+        .description {
+            color: #94a3b8;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        .match-reason {
+            background: #0f172a;
+            border-left: 3px solid #22c55e;
+            padding: 12px 15px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 15px;
+            color: #86efac;
+            font-size: 0.9rem;
+        }
+        .eligibility {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        .eligibility-tag {
+            background: #0f172a;
+            color: #a78bfa;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            border: 1px solid #334155;
+        }
+        .apply-btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .apply-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3);
+        }
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #64748b;
+        }
+        .no-results h2 {
+            color: #94a3b8;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="/" class="back-btn">← Back to Profile</a>
+            <h1>📋 {{ profile.name }}'s Search Results</h1>
+            <p>Opportunities matched to your profile</p>
+        </div>
+
+        {% if count > 0 %}
+        <div class="stats">
+            <div>
+                <div class="number">{{ count }}</div>
+                <div class="label">Opportunities Found</div>
+            </div>
+            <div>
+                <div class="number">{{ profile.nationality }}</div>
+                <div class="label">Nationality</div>
+            </div>
+            <div>
+                <div class="number">{{ profile.field }}</div>
+                <div class="label">Field</div>
+            </div>
+        </div>
+
+        {% for opp in opportunities %}
+        <div class="opportunity-card">
+            <div class="card-header">
+                <div>
+                    <div class="card-title">{{ opp.title }}</div>
+                    <div class="card-org">{{ opp.organization }}</div>
+                </div>
+                <div class="score-badge">{{ (opp.relevance_score * 100)|int }}% Match</div>
+            </div>
+
+            <div class="type-badge">{{ opp.type }}</div>
+
+            <div class="card-details">
+                <div class="detail-item">
+                    <span class="icon">⏰</span>
+                    <span>{{ opp.deadline }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="icon">💰</span>
+                    <span>{{ opp.funding }}</span>
+                </div>
+            </div>
+
+            <div class="description">{{ opp.description }}</div>
+
+            <div class="match-reason">
+                ✅ {{ opp.match_reason }}
+            </div>
+
+            <div class="eligibility">
+                {% for item in opp.eligibility %}
+                <span class="eligibility-tag">{{ item }}</span>
+                {% endfor %}
+            </div>
+
+            <a href="{{ opp.url }}" target="_blank" class="apply-btn">Apply Now →</a>
+        </div>
+        {% endfor %}
+
+        {% else %}
+        <div class="no-results">
+            <h2>No opportunities found</h2>
+            <p>Try adjusting your profile or running the search again.</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
