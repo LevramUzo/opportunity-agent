@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saved Opportunities - Opportunity Intelligence</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .nav h1 {
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .nav-links a {
+            color: #94a3b8;
+            text-decoration: none;
+            margin-left: 20px;
+        }
+        .nav-links a:hover {
+            color: #60a5fa;
+        }
+        .stats {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .stats .number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #60a5fa;
+        }
+        .stats .label {
+            color: #64748b;
+        }
+        .opportunity-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        .card-org {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+        .type-badge {
+            display: inline-block;
+            background: #0f172a;
+            color: #60a5fa;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+        .card-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-bottom: 15px;
+            color: #94a3b8;
+        }
+        .description {
+            color: #cbd5e1;
+            margin-bottom: 15px;
+        }
+        .apply-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+        }
+        .no-saved {
+            text-align: center;
+            padding: 60px;
+            color: #64748b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav">
+            <h1>📚 Saved Opportunities</h1>
+            <div class="nav-links">
+                <a href="/">Dashboard</a>
+                <a href="/logout">Log Out</a>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="number">{{ count }}</div>
+            <div class="label">Saved Opportunities</div>
+        </div>
+
+        {% if saved %}
+            {% for opp in saved %}
+            <div class="opportunity-card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">{{ opp.title }}</div>
+                        <div class="card-org">{{ opp.organization }}</div>
+                    </div>
+                </div>
+                <div class="type-badge">{{ opp.type }}</div>
+                <div class="card-details">
+                    <div>⏰ {{ opp.deadline }}</div>
+                    <div>💰 {{ opp.funding }}</div>
+                </div>
+                <div class="description">{{ opp.description }}</div>
+                <a href="{{ opp.url }}" target="_blank" class="apply-btn">Apply Now →</a>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-saved">
+                <h2>No saved opportunities yet</h2>
+                <p>Search for opportunities and save the ones you like.</p>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

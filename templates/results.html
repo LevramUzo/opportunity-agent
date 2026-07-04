@@ -180,13 +180,25 @@
             color: #94a3b8;
             margin-bottom: 10px;
         }
+        .save-btn {
+            padding: 8px 16px;
+            background: #1e293b;
+            color: #60a5fa;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .save-btn:hover {
+            background: #334155;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <a href="/" class="back-btn">← Back to Profile</a>
-            <h1>📋 {{ profile.name }}'s Search Results</h1>
+            <h1>📋 {{ user.name }}'s Search Results</h1>
             <p>Opportunities matched to your profile</p>
         </div>
 
@@ -197,11 +209,11 @@
                 <div class="label">Opportunities Found</div>
             </div>
             <div>
-                <div class="number">{{ profile.nationality }}</div>
+                <div class="number">{{ user.nationality }}</div>
                 <div class="label">Nationality</div>
             </div>
             <div>
-                <div class="number">{{ profile.field }}</div>
+                <div class="number">{{ user.field }}</div>
                 <div class="label">Field</div>
             </div>
         </div>
@@ -214,6 +226,19 @@
                     <div class="card-org">{{ opp.organization }}</div>
                 </div>
                 <div class="score-badge">{{ (opp.relevance_score * 100)|int }}% Match</div>
+                            <form action="/save" method="post" style="margin-top: 15px;">
+                    <input type="hidden" name="title" value="{{ opp.title }}">
+                    <input type="hidden" name="organization" value="{{ opp.organization }}">
+                    <input type="hidden" name="type" value="{{ opp.type }}">
+                    <input type="hidden" name="deadline" value="{{ opp.deadline }}">
+                    <input type="hidden" name="funding" value="{{ opp.funding }}">
+                    <input type="hidden" name="eligibility" value="{{ opp.eligibility | join(', ') }}">
+                    <input type="hidden" name="description" value="{{ opp.description }}">
+                    <input type="hidden" name="url" value="{{ opp.url }}">
+                    <input type="hidden" name="relevance_score" value="{{ opp.relevance_score }}">
+                    <input type="hidden" name="match_reason" value="{{ opp.match_reason }}">
+                    <button type="submit" class="save-btn">💾 Save</button>
+                </form>
             </div>
 
             <div class="type-badge">{{ opp.type }}</div>

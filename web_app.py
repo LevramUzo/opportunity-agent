@@ -1,36 +1,22 @@
 import os
 import json
 import re
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Form, Depends, HTTPException, status
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse
+from starlette.middleware.sessions import SessionMiddleware
 import uvicorn
 from tavily import TavilyClient
+from database import get_db, hash_password, verify_password
 
 # ─── API KEYS ───
 TAVILY_KEY = os.getenv("TAVILY_API_KEY")
-
-if not TAVILY_KEY:
-    print("⚠️  Warning: TAVILY_API_KEY not set. Set it before running.")
-
 tavily = TavilyClient(api_key=TAVILY_KEY) if TAVILY_KEY else None
 
 # ─── APP SETUP ───
 app = FastAPI(title="Opportunity Intelligence Agent")
+app.add_middleware(SessionMiddleware, secret_key="your-secret-key-change-this-in-production")
 templates = Jinja2Templates(directory="templates")
-
-# Create templates directory if it doesn't exist
-os.makedirs("templates", exist_ok=True)
-
-# ─── PROFILE ───
-MY_PROFILE = {
-    "name": "Opara Marvellous",
-    "nationality": "Nigerian",
-    "education": "BSc Physics",
-    "field": "AI / Machine Learning",
-    "status": "NYSC",
-    "interests": ["scholarships", "fellowships", "internships", "grants"],
-}
 
 # ─── KEYWORD DETECTION ───
 TYPE_KEYWORDS = {
@@ -189,29 +175,114 @@ def process_results(raw_results, profile):
     opportunities.sort(key=lambda x: x["relevance_score"], reverse=True)
     return opportunities
 
+# ─── AUTH HELPERS ───
+def get_current_user(request: Request):
+    user_id = request.session.get("user_id")
+    if not user_id:
+        return None
+    conn = get_db()
+    user = conn.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
+    conn.close()
+    return dict(user) if user else None
+
 # ─── ROUTES ───
 @app.get("/", response_class=HTMLResponse)
-def home(request: Request):
+def home(request: Request, user: dict = Depends(get_current_user)):
+    if user:
+        return templates.TemplateResponse(
+            request=request,
+            name="dashboard.html",
+            context={"user": user}
+        )
     return templates.TemplateResponse(
         request=request,
         name="index.html",
-        context={"profile": MY_PROFILE}
+        context={}
     )
 
-@app.post("/search", response_class=HTMLResponse)
-def search(request: Request):
+@app.get("/signup", response_class=HTMLResponse)
+def signup_page(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="signup.html",
+        context={}
+    )
+
+@app.post("/signup")
+def signup(request: Request, email: str = Form(...), password: str = Form(...), 
+           name: str = Form(...), nationality: str = Form(...), 
+           education: str = Form(...), field: str = Form(...), 
+           status: str = Form(...)):
+    
+    conn = get_db()
+    cursor = conn.cursor()
+    
+    existing = cursor.execute("SELECT id FROM users WHERE email = ?", (email,)).fetchone()
+    if existing:
+        conn.close()
+        raise HTTPException(status_code=400, detail="Email already registered")
+    
+    password_hash = hash_password(password)
+    cursor.execute("""
+        INSERT INTO users (email, password_hash, name, nationality, education, field, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    """, (email, password_hash, name, nationality, education, field, status))
+    
+    conn.commit()
+    user_id = cursor.lastrowid
+    conn.close()
+    
+    request.session["user_id"] = user_id
+    return RedirectResponse(url="/", status_code=302)
+
+@app.get("/login", response_class=HTMLResponse)
+def login_page(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="login.html",
+        context={}
+    )
+
+@app.post("/login")
+def login(request: Request, email: str = Form(...), password: str = Form(...)):
+    conn = get_db()
+    user = conn.execute("SELECT * FROM users WHERE email = ?", (email,)).fetchone()
+    conn.close()
+    
+    if not user or not verify_password(password, user["password_hash"]):
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+    
+    request.session["user_id"] = user["id"]
+    return RedirectResponse(url="/", status_code=302)
+
+@app.get("/logout")
+def logout(request: Request):
+    request.session.clear()
+    return RedirectResponse(url="/", status_code=302)
+
+@app.post("/search")
+def search(request: Request, user: dict = Depends(get_current_user)):
+    if not user:
+        return RedirectResponse(url="/login", status_code=302)
+    
     if not tavily:
         return templates.TemplateResponse(
             request=request,
             name="error.html",
-            context={"message": "TAVILY_API_KEY not set. Please set it and restart."}
+            context={"message": "TAVILY_API_KEY not set."}
         )
     
-    raw = search_opportunities(MY_PROFILE)
-    opportunities = process_results(raw, MY_PROFILE)
+    profile = {
+        "nationality": user["nationality"],
+        "education": user["education"],
+        "field": user["field"],
+        "status": user["status"],
+    }
     
-    with open("opportunities.json", "w") as f:
-        json.dump(opportunities, f, indent=2)
+    raw = search_opportunities(profile)
+    opportunities = process_results(raw, profile)
+    
+    request.session["last_results"] = json.dumps(opportunities)
     
     return templates.TemplateResponse(
         request=request,
@@ -219,17 +290,17 @@ def search(request: Request):
         context={
             "opportunities": opportunities,
             "count": len(opportunities),
-            "profile": MY_PROFILE
+            "user": user
         }
     )
 
 @app.get("/results", response_class=HTMLResponse)
-def view_results(request: Request):
-    try:
-        with open("opportunities.json", "r") as f:
-            opportunities = json.load(f)
-    except FileNotFoundError:
-        opportunities = []
+def view_results(request: Request, user: dict = Depends(get_current_user)):
+    if not user:
+        return RedirectResponse(url="/login", status_code=302)
+    
+    results_json = request.session.get("last_results", "[]")
+    opportunities = json.loads(results_json)
     
     return templates.TemplateResponse(
         request=request,
@@ -237,8 +308,51 @@ def view_results(request: Request):
         context={
             "opportunities": opportunities,
             "count": len(opportunities),
-            "profile": MY_PROFILE
+            "user": user
         }
+    )
+
+@app.post("/save")
+def save_opportunity(request: Request, title: str = Form(...), organization: str = Form(None),
+                     type: str = Form(None), deadline: str = Form(None), funding: str = Form(None),
+                     eligibility: str = Form(None), description: str = Form(None),
+                     url: str = Form(...), relevance_score: float = Form(0),
+                     match_reason: str = Form(None), user: dict = Depends(get_current_user)):
+    
+    if not user:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    conn = get_db()
+    conn.execute("""
+        INSERT INTO saved_opportunities 
+        (user_id, title, organization, type, deadline, funding, eligibility, description, url, relevance_score, match_reason)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, (user["id"], title, organization, type, deadline, funding, 
+          eligibility, description, url, relevance_score, match_reason))
+    conn.commit()
+    conn.close()
+    
+    return {"status": "saved"}
+
+@app.get("/saved", response_class=HTMLResponse)
+def saved_opportunities(request: Request, user: dict = Depends(get_current_user)):
+    if not user:
+        return RedirectResponse(url="/login", status_code=302)
+    
+    conn = get_db()
+    rows = conn.execute("""
+        SELECT * FROM saved_opportunities 
+        WHERE user_id = ? 
+        ORDER BY saved_at DESC
+    """, (user["id"],)).fetchall()
+    conn.close()
+    
+    saved = [dict(row) for row in rows]
+    
+    return templates.TemplateResponse(
+        request=request,
+        name="saved.html",
+        context={"saved": saved, "user": user, "count": len(saved)}
     )
 
 # ─── RUN ───
