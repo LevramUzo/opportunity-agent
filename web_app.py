@@ -355,6 +355,33 @@ def saved_opportunities(request: Request, user: dict = Depends(get_current_user)
         context={"saved": saved, "user": user, "count": len(saved)}
     )
 
+@app.get("/edit-profile", response_class=HTMLResponse)
+def edit_profile_page(request: Request, user: dict = Depends(get_current_user)):
+    if not user:
+        return RedirectResponse(url="/login", status_code=302)
+    return templates.TemplateResponse(
+        request=request,
+        name="edit_profile.html",
+        context={"user": user}
+    )
+
+@app.post("/edit-profile")
+def edit_profile(request: Request, name: str = Form(...), nationality: str = Form(...),
+                 education: str = Form(...), field: str = Form(...), status: str = Form(...),
+                 user: dict = Depends(get_current_user)):
+    if not user:
+        return RedirectResponse(url="/login", status_code=302)
+    
+    conn = get_db()
+    conn.execute("""
+        UPDATE users SET name = ?, nationality = ?, education = ?, field = ?, status = ?
+        WHERE id = ?
+    """, (name, nationality, education, field, status, user["id"]))
+    conn.commit()
+    conn.close()
+    
+    return RedirectResponse(url="/", status_code=302)
+
 # ─── RUN ───
 if __name__ == "__main__":
     import os
