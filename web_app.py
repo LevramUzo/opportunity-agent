@@ -382,6 +382,82 @@ def edit_profile(request: Request, name: str = Form(...), nationality: str = For
     
     return RedirectResponse(url="/", status_code=302)
 
+# ─── ADMIN ROUTES ───
+ADMIN_EMAIL = "arcstoneacademy@gmail.com"  # ← CHANGE THIS TO YOUR EMAIL
+
+def get_admin_user(request: Request):
+    user = get_current_user(request)
+    if not user or user.get("email") != ADMIN_EMAIL:
+        return None
+    return user
+
+@app.get("/admin", response_class=HTMLResponse)
+def admin_dashboard(request: Request, admin: dict = Depends(get_admin_user)):
+    if not admin:
+        return RedirectResponse(url="/", status_code=302)
+    
+    conn = get_db()
+    
+    total_users = conn.execute("SELECT COUNT(*) as count FROM users").fetchone()["count"]
+    total_saved = conn.execute("SELECT COUNT(*) as count FROM saved_opportunities").fetchone()["count"]
+    
+    recent_signups = conn.execute(
+        "SELECT * FROM users ORDER BY created_at DESC LIMIT 10"
+    ).fetchall()
+    
+    popular_fields = conn.execute("""
+        SELECT field, COUNT(*) as count 
+        FROM users 
+        GROUP BY field 
+        ORDER BY count DESC 
+        LIMIT 5
+    """).fetchall()
+    
+    conn.close()
+    
+    return templates.TemplateResponse(
+        request=request,
+        name="admin.html",
+        context={
+            "admin": admin,
+            "total_users": total_users,
+            "total_saved": total_saved,
+            "recent_signups": [dict(r) for r in recent_signups],
+            "popular_fields": [dict(r) for r in popular_fields],
+        }
+    )
+
+@app.get("/admin/users", response_class=HTMLResponse)
+def admin_users(request: Request, admin: dict = Depends(get_admin_user)):
+    if not admin:
+        return RedirectResponse(url="/", status_code=302)
+    
+    conn = get_db()
+    users = conn.execute("SELECT * FROM users ORDER BY created_at DESC").fetchall()
+    conn.close()
+    
+    return templates.TemplateResponse(
+        request=request,
+        name="admin_users.html",
+        context={
+            "admin": admin,
+            "users": [dict(u) for u in users],
+            "count": len(users)
+        }
+    )
+
+@app.get("/debug")
+def debug_user(request: Request):
+    user = get_current_user(request)
+    if not user:
+        return {"logged_in": False}
+    return {
+        "logged_in": True,
+        "email": user.get("email"),
+        "admin_email": ADMIN_EMAIL,
+        "is_admin": user.get("email") == ADMIN_EMAIL
+    }
+
 # ─── RUN ───
 if __name__ == "__main__":
     import os
