@@ -48,7 +48,7 @@ FUNDING_PATTERNS = [
 
 # ─── ADAPTIVE SEARCH REFINEMENT (Agentic Layer) ───
 REFINEMENT_TRIGGERS = {
-    "low_count": 3,           # Fewer than 3 results triggers refinement
+    "low_count": 6,           # Fewer than 6 results triggers refinement
     "low_confidence": 0.6,    # Avg relevance below 0.6 triggers refinement
     "max_rounds": 2,          # Maximum search rounds (initial + 1 refinement)
 }

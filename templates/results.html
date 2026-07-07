@@ -3,6 +3,25 @@
 {% block title %}Search Results - Opportunity Intelligence{% endblock %}
 
 {% block content %}
+<!-- Search Metadata Banner — Always Visible for Transparency -->
+{% if metadata %}
+<div class="search-meta-banner animate-fade-up {% if metadata.refined %}search-meta-refined{% endif %}">
+    <div class="search-meta-icon">{% if metadata.refined %}🔍{% else %}✅{% endif %}</div>
+    <div class="search-meta-text">
+        {% if metadata.refined %}
+        <strong>Expanded search to find more matches</strong>
+        <span>Initial search found {{ metadata.initial_count }} opportunities. 
+        We automatically searched {{ metadata.rounds }} rounds using adjusted terms. 
+        Found {{ metadata.final_count }} total.</span>
+        {% else %}
+        <strong>Search complete</strong>
+        <span>Found {{ metadata.final_count }} opportunities in {{ metadata.rounds }} round{% if metadata.rounds > 1 %}s{% endif %}. 
+        Average relevance: {{ metadata.initial_quality.avg_score }}.</span>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
 <div class="container">
     <div class="page-header animate-fade-up">
         <h1>Search Results</h1>
@@ -70,7 +89,7 @@
                     <input type="hidden" name="type" value="{{ opp.type }}">
                     <input type="hidden" name="deadline" value="{{ opp.deadline }}">
                     <input type="hidden" name="funding" value="{{ opp.funding }}">
-                    <input type="hidden" name="eligibility" value="{{ opp.eligibility | join(', ') }}">
+                    <input type="hidden" name="eligibility" value="{{ opp.eligibility | join(", ") }}">
                     <input type="hidden" name="description" value="{{ opp.description }}">
                     <input type="hidden" name="url" value="{{ opp.url }}">
                     <input type="hidden" name="relevance_score" value="{{ opp.relevance_score }}">
@@ -89,4 +108,45 @@
         </div>
     {% endif %}
 </div>
+
+<style>
+.search-meta-banner {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05));
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    animation: fadeUp 0.5s ease;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+}
+.search-meta-refined {
+    background: linear-gradient(135deg, rgba(56, 189, 248, 0.1), rgba(14, 165, 233, 0.05));
+    border-color: rgba(56, 189, 248, 0.2);
+}
+.search-meta-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+.search-meta-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.search-meta-text strong {
+    color: #34d399;
+    font-size: 0.95rem;
+}
+.search-meta-refined .search-meta-text strong {
+    color: #38bdf8;
+}
+.search-meta-text span {
+    color: #94a3b8;
+    font-size: 0.85rem;
+}
+</style>
 {% endblock %}
