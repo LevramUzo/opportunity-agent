@@ -5,15 +5,82 @@
 {% block nav %}{% endblock %}
 
 {% block content %}
+<!-- Trust Banner -->
+<div class="trust-banner animate-fade-up">
+    <span class="trust-icon">🔒</span>
+    <span>We never apply on your behalf. All applications go through official channels only.</span>
+</div>
+
 <div class="hero">
-    <div class="hero-badge animate-fade-up">
+    <div class="hero-badge animate-fade-up animate-delay-1">
         <span>🚀</span> Now Live — Free for African STEM Students
     </div>
     <h1 class="animate-fade-up animate-delay-1">Find Funding for Your Future</h1>
-    <p class="animate-fade-up animate-delay-2">AI-powered discovery of scholarships, fellowships, and grants matched to your unique profile. Built for African STEM students and graduates.</p>
+    <p class="animate-fade-up animate-delay-2">AI-powered discovery of scholarships, fellowships, and grants matched to your unique profile. We find the opportunities — you apply with confidence.</p>
     <div class="hero-buttons animate-fade-up animate-delay-3">
         <a href="/signup" class="btn btn-primary btn-lg">Get Started →</a>
         <a href="/login" class="btn btn-secondary btn-lg">Log In</a>
+    </div>
+</div>
+
+<!-- How It Works Section -->
+<div class="section section-alt">
+    <div class="container">
+        <h2 class="section-title animate-fade-up">How It Works</h2>
+        <p class="section-subtitle animate-fade-up">Three simple steps from search to application</p>
+
+        <div class="steps">
+            <div class="step animate-fade-up animate-delay-1">
+                <div class="step-number">1</div>
+                <div class="step-icon">📝</div>
+                <h3>Tell Us Your Profile</h3>
+                <p>Share your nationality, education level, field of study, and current status. This helps us filter for opportunities you actually qualify for.</p>
+            </div>
+            <div class="step-arrow animate-fade-up animate-delay-2">→</div>
+            <div class="step animate-fade-up animate-delay-2">
+                <div class="step-number">2</div>
+                <div class="step-icon">🔍</div>
+                <h3>We Search & Verify</h3>
+                <p>Our AI scans multiple sources, checks deadlines, and validates eligibility requirements against your profile in real-time.</p>
+            </div>
+            <div class="step-arrow animate-fade-up animate-delay-3">→</div>
+            <div class="step animate-fade-up animate-delay-3">
+                <div class="step-number">3</div>
+                <div class="step-icon">🎓</div>
+                <h3>You Apply Directly</h3>
+                <p>We give you the direct link to the official application. No middlemen. No auto-submission. You control every application yourself.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- What We Do / What We Don't -->
+<div class="section">
+    <div class="container">
+        <div class="comparison">
+            <div class="comparison-card do animate-fade-up animate-delay-1">
+                <h3>✅ What We Do</h3>
+                <ul>
+                    <li>Search across multiple databases and sources</li>
+                    <li>Filter by your nationality, field, and education level</li>
+                    <li>Extract and verify deadlines</li>
+                    <li>Check eligibility requirements against your profile</li>
+                    <li>Save opportunities for later tracking</li>
+                    <li>Provide direct links to official application pages</li>
+                </ul>
+            </div>
+            <div class="comparison-card dont animate-fade-up animate-delay-2">
+                <h3>❌ What We Don't Do</h3>
+                <ul>
+                    <li>Apply on your behalf</li>
+                    <li>Charge fees for application access</li>
+                    <li>Guarantee acceptance or funding</li>
+                    <li>Store your personal documents</li>
+                    <li>Replace official application processes</li>
+                    <li>Sell your data to third parties</li>
+                </ul>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -53,6 +120,188 @@
 </div>
 
 <div class="footer">
-    <p>Built with Python, FastAPI & Tavily • Open Source on <a href="https://github.com/LevramUzo/opportunity-agent" style="color: var(--accent-blue); text-decoration: none;">GitHub</a></p>
+    <p>Built with Python, FastAPI & Tavily By Marvell• Open Source on <a href="https://github.com/LevramUzo/opportunity-agent" style="color: var(--accent-blue); text-decoration: none;">GitHub</a></p>
 </div>
+
+<style>
+/* Trust Banner */
+.trust-banner {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.05));
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    border-radius: 12px;
+    padding: 12px 24px;
+    margin: 20px auto;
+    max-width: 800px;
+    text-align: center;
+    color: #34d399;
+    font-size: 0.95rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+.trust-icon {
+    font-size: 1.2rem;
+}
+
+/* Section Styles */
+.section {
+    padding: 60px 0;
+}
+.section-alt {
+    background: rgba(15, 23, 42, 0.5);
+    border-top: 1px solid rgba(148, 163, 184, 0.1);
+    border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+}
+.section-title {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, #f8fafc, #94a3b8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.section-subtitle {
+    text-align: center;
+    color: #94a3b8;
+    font-size: 1.1rem;
+    margin-bottom: 40px;
+}
+
+/* Steps */
+.steps {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+.step {
+    flex: 1;
+    min-width: 260px;
+    max-width: 320px;
+    background: rgba(30, 41, 59, 0.6);
+    border: 1px solid rgba(148, 163, 184, 0.1);
+    border-radius: 16px;
+    padding: 32px 24px;
+    text-align: center;
+    position: relative;
+    transition: all 0.3s ease;
+}
+.step:hover {
+    border-color: rgba(56, 189, 248, 0.3);
+    transform: translateY(-4px);
+}
+.step-number {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+}
+.step-icon {
+    font-size: 2.5rem;
+    margin: 8px 0 16px;
+}
+.step h3 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #f1f5f9;
+}
+.step p {
+    font-size: 0.9rem;
+    color: #94a3b8;
+    line-height: 1.6;
+}
+.step-arrow {
+    font-size: 1.8rem;
+    color: #38bdf8;
+    font-weight: 700;
+    opacity: 0.7;
+}
+@media (max-width: 900px) {
+    .step-arrow {
+        display: none;
+    }
+    .steps {
+        flex-direction: column;
+    }
+}
+
+/* Comparison Cards */
+.comparison {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+.comparison-card {
+    border-radius: 16px;
+    padding: 28px;
+    border: 1px solid;
+}
+.comparison-card.do {
+    background: rgba(16, 185, 129, 0.08);
+    border-color: rgba(16, 185, 129, 0.2);
+}
+.comparison-card.dont {
+    background: rgba(239, 68, 68, 0.08);
+    border-color: rgba(239, 68, 68, 0.2);
+}
+.comparison-card h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+.comparison-card.do h3 {
+    color: #34d399;
+}
+.comparison-card.dont h3 {
+    color: #f87171;
+}
+.comparison-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.comparison-card li {
+    padding: 8px 0;
+    font-size: 0.9rem;
+    color: #cbd5e1;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.05);
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+.comparison-card li:last-child {
+    border-bottom: none;
+}
+.comparison-card li::before {
+    content: "•";
+    color: #94a3b8;
+    font-weight: bold;
+}
+@media (max-width: 700px) {
+    .comparison {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
 {% endblock %}
