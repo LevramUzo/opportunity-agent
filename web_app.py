@@ -1,5 +1,4 @@
-from dotenv import load_dotenv
-load_dotenv()  # Loads .env file automatically
+
 import os
 import json
 import re
